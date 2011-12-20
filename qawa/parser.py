@@ -11,10 +11,9 @@ class QawaParser(object):
     """
 
     # add to default group
-    MSISDN = r'\+?\d+'
-    NAME = r'[a-zA-Z_\-\s]*'
-    GROUP_NAME = r'#?%s' % (NAME,)
-    ADD_TO_DEFAULT_GROUP = r'^(?P<group>%s)\+(?P<msisdn>%s)+\s?(?P<name>%s)$' % (GROUP_NAME, MSISDN, NAME)
+    MSISDN = r'\+?\d{5,12}'
+    NAME = r'[a-zA-Z_\-]*'
+    ADD_TO_DEFAULT_GROUP = r'^#?(?P<group>%s)\s?\+(?P<msisdn>%s)+\s?(?P<name>%s)$' % (NAME, MSISDN, NAME)
 
     def __init__(self):
         self.valid_patterns = [
@@ -23,6 +22,7 @@ class QawaParser(object):
 
     def parse(self, text):
         for ptype, pattern in self.valid_patterns:
+            print text, 'vs', pattern
             match = re.match(pattern, text.strip())
             if match:
                 handler = getattr(self, 'handle_%s' % ptype, self.noop)
