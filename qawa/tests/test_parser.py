@@ -89,3 +89,10 @@ class ParserTestCase(TestCase):
         self.assertParsedResponse('?name-with_both', ('query', {
             'name': 'name-with_both',
         }))
+
+    def test_find_groups(self):
+        text = 'Hello #coffeelovers, grabbing coffee at #olympia'
+        self.assertEqual(self.parser.find_groups(text),
+                            ['coffeelovers', 'olympia'])
+        text = 'something without groups'
+        self.assertEqual(self.parser.find_groups(text), [])

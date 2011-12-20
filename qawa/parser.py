@@ -30,12 +30,15 @@ class QawaParser(object):
 
     def parse(self, text):
         for ptype, pattern in self.valid_patterns:
-            print text, 'vs', pattern
             match = re.match(pattern, text.strip())
             if match:
                 handler = getattr(self, 'handle_%s' % ptype, self.noop)
                 return handler(ptype, **match.groupdict())
         raise SyntaxError('Unable to parse %s' % (text,))
+
+    def find_groups(self, text):
+        pattern = r'#(?P<group>%s+)' % (self.NAME,)
+        return re.findall(pattern, text)
 
     def handle_add(self, ptype, group, msisdn, name):
         return (ptype, {
