@@ -59,3 +59,33 @@ class ParserTestCase(TestCase):
             self.assertParsedResponse('#coffeelovers +%s simon_de_haan' %
                                         (number,), response)
 
+    def test_remove_from_group_without_name(self):
+        response = ('remove', {
+            'group': None,
+            'msisdn': '+27761234567',
+        })
+        for number in self.number_variations:
+            self.assertParsedResponse('-%s' % (number,), response)
+
+    def test_remove_from_group_with_name(self):
+        response = ('remove', {
+            'group': 'coffeelovers',
+            'msisdn': '+27761234567',
+        })
+        for number in self.number_variations:
+            self.assertParsedResponse('#coffeelovers -%s' % (number,),
+                                        response)
+
+    def test_query(self):
+        self.assertParsedResponse('?groups', ('query', {
+            'name': 'groups',
+        }))
+        self.assertParsedResponse('?name_with_underscore', ('query', {
+            'name': 'name_with_underscore',
+        }))
+        self.assertParsedResponse('?name_with_dash', ('query', {
+            'name': 'name_with_dash',
+        }))
+        self.assertParsedResponse('?name-with_both', ('query', {
+            'name': 'name-with_both',
+        }))
