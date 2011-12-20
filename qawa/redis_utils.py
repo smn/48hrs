@@ -142,6 +142,14 @@ class GroupStore(RedisStore):
 
     record_class = GroupStoreRecord
 
-    def generate_key(self, name):
-        return 'group:%s' % (name,)
+    def generate_key(self, *args):
+        return ':'.join(['group'] + map(str, args))
+
+    def find_for_user(self, user_id, group_name):
+        key = self.generate_key(group_name, user_id)
+        return self.find(key)
+
+    def create_for_user(self, user_id, group_name):
+        key = self.generate_key(group_name, user_id)
+        return self.create(key, {'name': group_name})
 
