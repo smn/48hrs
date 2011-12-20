@@ -38,7 +38,7 @@ class QawaParser(object):
         return self.handle_default(text)
 
     def find_groups(self, text):
-        pattern = r'#(?P<group>%s+)' % (self.NAME,)
+        pattern = r'#(?P<group>%s+)' % (self.GROUP_NAME,)
         return re.findall(pattern, text)
 
     def handle_default(self, text):
