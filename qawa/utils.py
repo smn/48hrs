@@ -16,8 +16,5 @@ def pin_required(function):
                     
     return wrapper
 
-def authenticate(username, password):
-    return username == 'test' and passowrd == 'test'
-
 def json_response(data, status = 200):
     return HttpResponse(json.dumps(data), status = status, content_type='application/json')

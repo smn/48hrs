@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><testsuite name="nosetests" tests="5" errors="0" failures="1" skip="0"><testcase classname="qawa.tests.test_api.ApiTestCase" name="test_authentication" time="0.037"><failure type="exceptions.AssertionError" message="403 != 200 : Couldn't retrieve content: Response code was 403 (expected 200)&#10;-------------------- &gt;&gt; begin captured stdout &lt;&lt; ---------------------&#10;TODO: smn&#10;&#10;--------------------- &gt;&gt; end captured stdout &lt;&lt; ----------------------"><![CDATA[Traceback (most recent call last):
+  File "/home/tonym/work/48hrs/ve/lib/python2.6/site-packages/django/utils/unittest/case.py", line 339, in run
+    testMethod()
+  File "/home/tonym/work/48hrs/qawa/../qawa/tests/test_api.py", line 50, in test_authentication
+    self.assertContains(resp, '"auth": true')
+  File "/home/tonym/work/48hrs/ve/lib/python2.6/site-packages/django/test/testcases.py", line 421, in assertContains
+    " (expected %d)" % (response.status_code, status_code))
+  File "/home/tonym/work/48hrs/ve/lib/python2.6/site-packages/django/utils/unittest/case.py", line 520, in assertEqual
+    assertion_func(first, second, msg=msg)
+  File "/home/tonym/work/48hrs/ve/lib/python2.6/site-packages/django/utils/unittest/case.py", line 513, in _baseAssertEqual
+    raise self.failureException(msg)
+AssertionError: 403 != 200 : Couldn't retrieve content: Response code was 403 (expected 200)
+-------------------- >> begin captured stdout << ---------------------
+TODO: smn
+
+--------------------- >> end captured stdout << ----------------------
+]]></failure></testcase><testcase classname="qawa.tests.test_parser.ParserTestCase" name="test_add_to_default_group_with_name" time="0.002" /><testcase classname="qawa.tests.test_parser.ParserTestCase" name="test_add_to_default_group_without_name" time="0.000" /><testcase classname="qawa.tests.test_parser.ParserTestCase" name="test_add_to_named_group_with_name" time="0.000" /><testcase classname="qawa.tests.test_parser.ParserTestCase" name="test_add_to_named_group_without_name" time="0.000" /></testsuite>
