@@ -36,6 +36,8 @@ The UI should be similar to a regular IM chat application:
 
 * top part with incoming messages (scrolled down & newest automatically appended at the bottom)
 * bottom part a text input field for message submission
+* Needs to allow for a listing of groups
+* Needs to allow for the creation & deletion of groups
 
 The experience to be as realtime as possible and have two options:
 
