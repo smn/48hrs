@@ -5,3 +5,7 @@
 /logs/
 /tmp/
 /config/
+/qawa/cover/
+.coverage
+qawa/coverage.xml
+qawa/nosetests.xml
