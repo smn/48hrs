@@ -1,0 +1,12 @@
+[
+    {
+        "author": "1234567890",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "the message posted"
+    },
+    {
+        "author": "1234567890",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "the message posted"
+    }
+]

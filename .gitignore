@@ -4,3 +4,4 @@
 *.db
 /logs/
 /tmp/
+/config/

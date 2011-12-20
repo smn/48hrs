@@ -1,0 +1,6 @@
+username: username@xmpphost.com
+password: password
+status: Qawa!
+host: talk.google.com
+port: 5222
+debug: False

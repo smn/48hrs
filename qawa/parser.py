@@ -2,7 +2,10 @@ import re
 from vumi.utils import normalize_msisdn
 
 class QawaParserException(Exception): pass
-class SyntaxError(QawaParserException): pass
+class QawaSyntaxError(QawaParserException): pass
+
+def normalize(string):
+    return normalize_msisdn(string, country_code='27')
 
 class QawaParser(object):
     """
@@ -11,29 +14,56 @@ class QawaParser(object):
     """
 
     # add to default group
-    MSISDN = r'\+?\d{5,12}'
-    NAME = r'[a-zA-Z_\-]*'
-    ADD_TO_DEFAULT_GROUP = r'^#?(?P<group>%s)\s?\+(?P<msisdn>%s)+\s?(?P<name>%s)$' % (NAME, MSISDN, NAME)
+    MSISDN = r'\+?\d{10,12}'
+    NAME = r'[a-zA-Z_\-\s]'
+    GROUP_NAME = r'[a-zA-Z_\-]'
+    QUERY = r'^\?(?P<name>%s+)' % (GROUP_NAME,)
+    ADD_TO_GROUP = r'^#?(?P<group>%s*)\s?\+(?P<msisdn>%s)\s?(?P<name>%s*)$' % (GROUP_NAME, MSISDN, NAME)
+    REMOVE_FROM_GROUP = r'^#?(?P<group>%s*)\s?\-(?P<msisdn>%s)$' % (GROUP_NAME, MSISDN)
 
     def __init__(self):
+        # Unfortunately order is important
         self.valid_patterns = [
-            ('add', self.ADD_TO_DEFAULT_GROUP),
+            ('query', re.compile(self.QUERY)),
+            ('remove', re.compile(self.REMOVE_FROM_GROUP)),
+            ('add', re.compile(self.ADD_TO_GROUP)),
         ]
 
     def parse(self, text):
         for ptype, pattern in self.valid_patterns:
-            print text, 'vs', pattern
-            match = re.match(pattern, text.strip())
+            match = pattern.match(text.strip())
             if match:
                 handler = getattr(self, 'handle_%s' % ptype, self.noop)
                 return handler(ptype, **match.groupdict())
-        raise SyntaxError('Unable to parse %s' % (text,))
+        return self.handle_default(text)
+
+    def find_groups(self, text):
+        pattern = r'#(?P<group>%s+)' % (self.GROUP_NAME,)
+        return re.findall(pattern, text)
+
+    def handle_default(self, text):
+        groups = self.find_groups(text)
+        return ('broadcast', {
+            'groups': groups,
+            'message': text,
+        })
 
     def handle_add(self, ptype, group, msisdn, name):
         return (ptype, {
             'group': group or None,
-            'msisdn': normalize_msisdn(msisdn, country_code='27'),
+            'msisdn': normalize(msisdn),
             'name': name or None,
+        })
+
+    def handle_remove(self, ptype, group, msisdn):
+        return (ptype, {
+            'group': group or None,
+            'msisdn': normalize(msisdn),
+        })
+
+    def handle_query(self, ptype, name):
+        return (ptype, {
+            'name': name,
         })
 
     def noop(self, ptype, **kwargs):

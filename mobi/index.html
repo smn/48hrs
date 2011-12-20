@@ -9,18 +9,68 @@
     <script type="text/javascript" src="js/ender.min.js"></script>
     <script type="text/javascript">
 
-        $.domReady(function() {
 
-            $('#message_list').hide();
+
+
+        var ChatService = (function() {
+
+            var klass = function() {
+
+            };
+            klass.fn = klass.prototype;
+
+
+            klass.fn.get_past = function(opts) {
+                /* ths message will fetch all past messages */
+
+                $.ajax(opts);
+            };
+
+            klass.fn.get_live = function(opts) {
+                /* this method will poll for new messages */
+
+
+                // on success, draw, and recall this method.
+            };
+
+
+
+
+            return klass;
+        })();
+
+
+
+
+        $.domReady(function() {
+            /*
+                1. resize body window height to accommodate device window height.
+                2. Connect to channel.
+            */
+
+
+
+            var cs = new ChatService();
+
 
             var channel = window.location.hash || false;
             if (channel) {
                 $('#status').html('Connecting to ' + channel + '...');
+
+                cs.get_past({
+                    url: '/messages.json',
+                    success: function(r) {
+                        console.log('pew')
+                    },
+                    error: function() {
+                        console.log('error');
+                    },
+                });
+
+
             } else {
-                $('#status').html('Select a channel.')
+                $('#status').html('Please select a channel.')
             }
-
-
 
 
         });
@@ -40,13 +90,7 @@
                 <li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li>
             </ul>
 
-            <div id="status">
-
-
-
-
-                Connecting to #PTA.
-            </div>
+            <div id="status">Loading...</div>
         </div>
 
 
