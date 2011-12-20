@@ -23,11 +23,8 @@ def auth(request):
             return json_response({'auth': False, 'reason': errors})
         
     if request.session.get(settings.QAWA_SESSION_KEY):
-        auth = True
-    else:
-        auth = False
-        
-    return json_response({'auth': auth, 'reason': 'You need to login first.'}, status = 403)
+        return json_response({'auth': True})
+    return json_response({'auth': False, 'reason': 'You need to login first.'}, status = 403)
     
 def register(request):
     if request.method == 'POST':
