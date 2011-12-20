@@ -34,11 +34,18 @@ class QawaParser(object):
             if match:
                 handler = getattr(self, 'handle_%s' % ptype, self.noop)
                 return handler(ptype, **match.groupdict())
-        raise QawaSyntaxError('Unable to parse %s' % (text,))
+        return self.handle_default(text)
 
     def find_groups(self, text):
         pattern = r'#(?P<group>%s+)' % (self.NAME,)
         return re.findall(pattern, text)
+
+    def handle_default(self, text):
+        groups = self.find_groups(text)
+        return ('broadcast', {
+            'groups': groups,
+            'message': text,
+        })
 
     def handle_add(self, ptype, group, msisdn, name):
         return (ptype, {

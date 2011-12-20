@@ -96,3 +96,17 @@ class ParserTestCase(TestCase):
                             ['coffeelovers', 'olympia'])
         text = 'something without groups'
         self.assertEqual(self.parser.find_groups(text), [])
+
+    def test_broadcast_to_group_without_name(self):
+        text = 'something without groups'
+        self.assertParsedResponse(text, ('broadcast', {
+            'groups': [],
+            'message': text,
+        }))
+
+    def test_broadcast_to_group_with_name(self):
+        text = 'Hello #coffeelovers, grabbing coffee at #olympia'
+        self.assertParsedResponse(text, ('broadcast', {
+            'groups': ['coffeelovers', 'olympia'],
+            'message': text,
+        }))
