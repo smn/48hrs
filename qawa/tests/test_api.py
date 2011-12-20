@@ -7,7 +7,8 @@ from qawa.redis_utils import UserStore
 
 class ApiTestCase(TestCase):
     def setUp(self):
-        views.user_store = UserStore(FakeRedis)
+        fake_redis = FakeRedis()
+        views.user_store = UserStore(fake_redis)
         self.client = Client()
 
     def test_authentication(self):

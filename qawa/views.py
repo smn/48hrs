@@ -3,8 +3,10 @@ from qawa.utils import pin_required, json_response
 from qawa.forms import AuthForm, RegisterForm
 from qawa.redis_utils import UserStore
 from django.conf import settings
+import redis
 
-user_store = UserStore()
+redis = redis.Redis()
+user_store = UserStore(redis)
 
 def auth(request):
     if request.method == 'POST':

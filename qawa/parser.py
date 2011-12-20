@@ -18,8 +18,8 @@ class QawaParser(object):
     NAME = r'[a-zA-Z_\-\s]'
     GROUP_NAME = r'[a-zA-Z_\-]'
     QUERY = r'^\?(?P<name>%s+)' % (GROUP_NAME,)
-    ADD_TO_GROUP = r'^#?(?P<group>%s*)\s?\+(?P<msisdn>%s)\s?(?P<name>%s*)$' % (GROUP_NAME, MSISDN, NAME)
-    REMOVE_FROM_GROUP = r'^#?(?P<group>%s*)\s?\-(?P<msisdn>%s)$' % (GROUP_NAME, MSISDN)
+    ADD_TO_GROUP = r'^#?(?P<group_name>%s*)\s?\+(?P<msisdn>%s)\s?(?P<name>%s*)$' % (GROUP_NAME, MSISDN, NAME)
+    REMOVE_FROM_GROUP = r'^#?(?P<group_name>%s*)\s?\-(?P<msisdn>%s)$' % (GROUP_NAME, MSISDN)
 
     def __init__(self):
         # Unfortunately order is important
@@ -38,7 +38,7 @@ class QawaParser(object):
         return self.handle_default(text)
 
     def find_groups(self, text):
-        pattern = r'#(?P<group>%s+)' % (self.GROUP_NAME,)
+        pattern = r'#(?P<group_name>%s+)' % (self.GROUP_NAME,)
         return re.findall(pattern, text)
 
     def handle_default(self, text):
@@ -48,16 +48,16 @@ class QawaParser(object):
             'message': text,
         })
 
-    def handle_add(self, ptype, group, msisdn, name):
+    def handle_add(self, ptype, group_name, msisdn, name):
         return (ptype, {
-            'group': group or None,
+            'group_name': group_name,
             'msisdn': normalize(msisdn),
-            'name': name or None,
+            'name': name,
         })
 
-    def handle_remove(self, ptype, group, msisdn):
+    def handle_remove(self, ptype, group_name, msisdn):
         return (ptype, {
-            'group': group or None,
+            'group_name': group_name,
             'msisdn': normalize(msisdn),
         })
 

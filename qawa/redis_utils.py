@@ -1,9 +1,13 @@
 import redis
 
 class RedisStoreException(Exception): pass
-class RecordDoesNotExist(RedisStoreException): pass
+class RecordNotFound(RedisStoreException): pass
 
 class RedisRecord(object):
+    """
+    Base record for storing stuff in Redis. All data is
+    mapped to a Redis hash.
+    """
 
     def __init__(self, store, key, **data):
         self.store = store
@@ -30,42 +34,71 @@ class RedisRecord(object):
         self.store.save_dict(self.key, self._data)
 
     def reload(self):
-        return self.store.record(self.key, self.store.read_dict(self.key))
+        return self.store.make_record(self.key, self.store.read_dict(self.key))
 
 class RedisStore(object):
+    """
+    A store for managing the storage and retrieval of data from Redis.
+    This must be subclassed as each store is be responsible for generating
+    their own unique key with the `generate_key()` function.
+
+    If `record_class` is provided then that class will be used to create
+    the records with. Whatever it is, it must subclass or duck-type the
+    base `RecordClass`.
+    """
 
     record_class = RedisRecord
 
-    def __init__(self, redis_class=redis.Redis):
-        self.server = redis_class()
+    def __init__(self, redis):
+        self.r_server = redis
+        exception_class_name = '%sRecordNotFound' % (self.__class__.__name__,)
+        self.__class__.RecordNotFound = type(exception_class_name,
+                                            (RecordNotFound,), {})
 
     def generate_key(self, key):
         raise RedisStoreException('Please override the generate_key() function')
 
     def key_exists(self, key):
-        return self.server.exists(key)
+        return self.r_server.exists(key)
 
-    def record(self, key, data):
+    def make_record(self, key, data):
         return self.record_class(self, key, **data)
 
     def save_dict(self, key, data):
-        self.server.hmset(key, data)
+        self.r_server.hmset(key, data)
 
     def read_dict(self, key):
-        return self.server.hgetall(key)
+        return self.r_server.hgetall(key)
+
+    def add_to_set(self, key, data):
+        self.r_server.sadd(key, data)
+
+    def remove_from_set(self, key, data):
+        self.r_server.srem(key, data)
+
+    def set_members(self, key):
+        return self.r_server.smembers(key)
 
     def create(self, pk, data):
         key = self.generate_key(pk)
-        record = self.record(key, data)
+        record = self.make_record(key, data)
         record.save()
         return record
+
+    def get_or_make(self, pk):
+        key = self.generate_key(pk)
+        try:
+            return self.find(key), False
+        except self.RecordNotFound:
+            return self.make_record(key, {}), True
 
     def find(self, pk):
         key = self.generate_key(pk)
         if self.key_exists(key):
             data = self.read_dict(key)
-            return self.record(key, data)
-        raise RecordDoesNotExist('Cannot find record with key %s' % (repr(key),))
+            record = self.make_record(key, data)
+            return record
+        raise self.RecordNotFound('Cannot find record with key %s' % (repr(key),))
 
 
 class UserStore(RedisStore):
@@ -83,8 +116,32 @@ class UserStore(RedisStore):
     def user_exists(self, username):
         return self.key_exists(self.generate_key(username))
 
+class GroupStoreRecord(RedisRecord):
+
+    def __init__(self, *args, **kwargs):
+        super(GroupStoreRecord, self).__init__(*args, **kwargs)
+        self.members_key = '%s:members' % (self.key,)
+        self.user_store = UserStore(self.store.r_server)
+
+    def add_member(self, msisdn):
+        self.store.add_to_set(self.members_key, msisdn)
+
+    def members(self):
+        return [self.user_store.find(msisdn)
+                    for msisdn in self.store.set_members(self.members_key)]
+
+    def is_member(self, msisdn):
+        member_keys = [user.key for user in self.members()]
+        return self.user_store.generate_key(msisdn) in member_keys
+
+    def remove_member(self, msisdn):
+        self.store.remove_from_set(self.members_key, msisdn)
+
 
 class GroupStore(RedisStore):
 
+    record_class = GroupStoreRecord
+
     def generate_key(self, name):
         return 'group:%s' % (name,)
+
