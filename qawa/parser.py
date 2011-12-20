@@ -15,10 +15,11 @@ class QawaParser(object):
 
     # add to default group
     MSISDN = r'\+?\d{10,12}'
-    NAME = r'[a-zA-Z_\-]'
-    QUERY = r'^\?(?P<name>%s+)' % (NAME,)
-    ADD_TO_GROUP = r'^#?(?P<group>%s*)\s?\+(?P<msisdn>%s)\s?(?P<name>%s*)$' % (NAME, MSISDN, NAME)
-    REMOVE_FROM_GROUP = r'^#?(?P<group>%s*)\s?\-(?P<msisdn>%s)$' % (NAME, MSISDN)
+    NAME = r'[a-zA-Z_\-\s]'
+    GROUP_NAME = r'[a-zA-Z_\-]'
+    QUERY = r'^\?(?P<name>%s+)' % (GROUP_NAME,)
+    ADD_TO_GROUP = r'^#?(?P<group>%s*)\s?\+(?P<msisdn>%s)\s?(?P<name>%s*)$' % (GROUP_NAME, MSISDN, NAME)
+    REMOVE_FROM_GROUP = r'^#?(?P<group>%s*)\s?\-(?P<msisdn>%s)$' % (GROUP_NAME, MSISDN)
 
     def __init__(self):
         # Unfortunately order is important
