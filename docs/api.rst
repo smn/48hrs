@@ -63,8 +63,8 @@ POST /groups.json with `name` should return HTTP 201 created
 DELETE /groups.json with `name` should return HTTP 204
 
 
-Message retrieval
------------------
+Messages
+--------
 
 GET /messages.json with `group` parameter
 
@@ -80,3 +80,4 @@ GET /messages.json with `group` parameter
         ...
     }]
 
+POST /messages.json with `group` & `message` parameter should return HTTP 201 created, author & timestamp will be filled in automatically.
