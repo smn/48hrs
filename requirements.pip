@@ -3,3 +3,4 @@ gunicorn==0.13.4
 django-sentry
 django-nose
 supervisor==3.0a10
+-e git+http://github.com/praekelt/vumi.git@develop#egg=vumi

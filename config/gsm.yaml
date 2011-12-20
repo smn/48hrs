@@ -1,0 +1,15 @@
+transport_name: gsm_transport
+poll_interval: 2 # seconds, defaults to 60
+country_code: 27 # the international phone number country prefix
+phone_number: 27761234567 # the phone number of the SIM
+gammu:
+    UseGlobalDebugFile: 0
+    DebugFile: ''
+    SyncTime: 0
+    Connection: 'at'
+    LockDevice: 0
+    DebugLevel: ''
+    Device: '/dev/tty.usbmodem3d11'
+    #Device: '/dev/tty.HUAWEIMobile-Modem'
+    StartInfo: 0
+    Model: ''
