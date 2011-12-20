@@ -38,6 +38,7 @@ The UI should be similar to a regular IM chat application:
 * bottom part a text input field for message submission
 * Needs to allow for a listing of groups
 * Needs to allow for the creation & deletion of groups
+* It'd be very sexy if this could be a pure HTML + JS app built on some server-side JSON APIs
 
 The experience to be as realtime as possible and have two options:
 
