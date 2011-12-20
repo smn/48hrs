@@ -6,6 +6,6 @@
 /tmp/
 /config/
 /qawa/cover/
-qawa/.coverage
-qawa/coverage.xml
-qawa/nosetests.xml
+/qawa/.coverage
+/qawa/coverage.xml
+/qawa/nosetests.xml
