@@ -15,8 +15,8 @@ Allow for simple group texting via SMS. Replicate mailing list type behaviour ov
 * `?` reserved for querying
 * `+27761234567 [name]` to add to the default group. Default group is the group without a #hashtag
 * `-27761234567` to remove from the default group
-* Any text sent to the number without this is automatically broadcast to the group
-* Any replies received are automatically broadcast to all recipients in the group. Replies will be prefixed with either the name or the number before being broadcast.
+* Any text sent to the number without this is automatically broadcast to the group. No #hashtag defaults to the default group. The first #hashtag occurrence is considered to be the name of the group targetted. So `Hi #coffeelovers, meeting at 9 in Kalkbay` would go to #coffeelovers.
+* Any replies received are automatically broadcast to all recipients in the group. Replies will be prefixed with either the name or the number before being broadcast. Replies to groups other than the default group will need to be prefixed with the group #hashtag.
 * New members will be automatically sent an invitation SMS to join the group, either via SMS or Mobi.
 
 Group behaviour
