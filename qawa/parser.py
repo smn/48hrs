@@ -2,7 +2,7 @@ import re
 from vumi.utils import normalize_msisdn
 
 class QawaParserException(Exception): pass
-class SyntaxError(QawaParserException): pass
+class QawaSyntaxError(QawaParserException): pass
 
 def normalize(string):
     return normalize_msisdn(string, country_code='27')
@@ -34,7 +34,7 @@ class QawaParser(object):
             if match:
                 handler = getattr(self, 'handle_%s' % ptype, self.noop)
                 return handler(ptype, **match.groupdict())
-        raise SyntaxError('Unable to parse %s' % (text,))
+        raise QawaSyntaxError('Unable to parse %s' % (text,))
 
     def find_groups(self, text):
         pattern = r'#(?P<group>%s+)' % (self.NAME,)
