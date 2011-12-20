@@ -5,7 +5,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'qawa.views.home', name='home'),
+    url(r'^$', 'qawa.views.home', name='home'),
+    url(r'^auth.json$', 'qawa.views.is_auth', name='auth'),
     # url(r'^qawa/', include('qawa.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
