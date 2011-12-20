@@ -23,14 +23,14 @@ class QawaParser(object):
     def __init__(self):
         # Unfortunately order is important
         self.valid_patterns = [
-            ('query', self.QUERY),
-            ('remove', self.REMOVE_FROM_GROUP),
-            ('add', self.ADD_TO_GROUP),
+            ('query', re.compile(self.QUERY)),
+            ('remove', re.compile(self.REMOVE_FROM_GROUP)),
+            ('add', re.compile(self.ADD_TO_GROUP)),
         ]
 
     def parse(self, text):
         for ptype, pattern in self.valid_patterns:
-            match = re.match(pattern, text.strip())
+            match = pattern.match(text.strip())
             if match:
                 handler = getattr(self, 'handle_%s' % ptype, self.noop)
                 return handler(ptype, **match.groupdict())
