@@ -56,3 +56,13 @@ body, input {
     border-bottom:1px solid #999;
 }
 
+
+#message_list {
+    display:none;
+}
+
+#status {
+    text-align:center;
+    margin:35px 0;
+}
+

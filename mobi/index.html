@@ -4,21 +4,34 @@
     <meta charset="utf-8">
     <title>Qawa</title>
 
-    <script type="text/javascript" src="js/backbone+underscore.min.js" defer></script>
-    <script type="text/javascript">
-
-
-    </script>
 
     <link rel="stylesheet" type="text/css" href="css/base.css">
+    <script type="text/javascript" src="js/ender.min.js"></script>
+    <script type="text/javascript">
+
+        $.domReady(function() {
+
+            $('#message_list').hide();
+
+            var channel = window.location.hash || false;
+            if (channel) {
+                $('#status').html('Connecting to ' + channel + '...');
+            } else {
+                $('#status').html('Select a channel.')
+            }
 
 
+
+
+        });
+
+    </script>
 </head>
 <body>
 
     <div id="container">
         <div id="header">
-        Qawa
+            Qawa
         </div>
 
         <div id="body">
@@ -26,6 +39,14 @@
                 <li>1</li>
                 <li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li>
             </ul>
+
+            <div id="status">
+
+
+
+
+                Connecting to #PTA.
+            </div>
         </div>
 
 
