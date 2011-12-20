@@ -28,8 +28,6 @@ class ParserTestCase(TestCase):
                 'msisdn': '+27761234567',
                 'name': None,
             }))
-<<<<<<< HEAD
-=======
 
     def test_add_to_default_group_with_name(self):
         response = ('add', {
