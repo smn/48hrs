@@ -180,3 +180,22 @@ class GroupStore(RedisStore):
     def generate_key(self, *args):
         return ':'.join(['group'] + map(str, args))
 
+class MessageStore(RedisStore):
+
+    def generate_key(self, *args):
+        return ':'.join(['message'] + map(str, args))
+
+    def add(self, user_id, group_name, message):
+        key = self.generate_key(group_name)
+        self.r_server.lpush(key, message)
+        
+        key = self.generate_key(user_id, group_name)
+        self.r_server.lpush(key, message)
+
+    def get_messages(self, group_name):
+        key = self.generate_key(group_name)
+        return self.r_server.lrange(key, 0, 10)
+        
+    def get_live_messages(self, user_id, group_name):
+        key = self.generate_key(user_id, group_name)
+        return self.r_server.lpop(key)
