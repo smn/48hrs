@@ -9,6 +9,7 @@ class VumiappTestCase(ApplicationTestCase):
 
     application_class = QawaApplication
     msisdn = '27123456789'
+    other_msisdn = '27123456790'
 
     def setUp(self):
         super(VumiappTestCase, self).setUp()
@@ -44,6 +45,10 @@ class VumiappTestCase(ApplicationTestCase):
         self.assertEqual(response2['content'], '+%s removed from %s' %
                             (self.msisdn, 'coffeelovers'))
 
-    # @inlineCallbacks
-    # def test_remove_from_named_group_without_membership(self):
-    #     msg = yield self.fake_incoming('#coffeelovers')
+    @inlineCallbacks
+    def test_remove_from_named_group_without_membership(self):
+        yield self.fake_incoming('+%s' % (self.msisdn,))
+        yield self.fake_incoming('#coffeelovers +%s' % (self.other_msisdn,))
+        yield self.fake_incoming('#coffeelovers -%s' % (self.msisdn,))
+        [_, _, response] = yield self.wait_for_dispatched_messages(1)
+        self.assertEqual(response['content'], '+%s not a member of coffeelovers' % (self.msisdn, ))
