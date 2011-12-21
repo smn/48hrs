@@ -1,3 +1,4 @@
+# -*- test-case-name: qawa.test_vumiapp -*-
 from twisted.python import log
 from vumi.application import ApplicationWorker
 from qawa.parser import QawaParser, QawaSyntaxError

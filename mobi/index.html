@@ -27,13 +27,17 @@
                     msgs_html = '';
 
 
+
+                // should trim some of the old messages off.
+
+
                 for (var i = 0; i < l; i++) {
                     var msg = msgs[i];
                      msgs_html += '<li><span>' + msg.author + '</span>' + msg.message + '</li>';
                 }
                 $('#message_list').append(msgs_html)
 
-                $('#body')[0].scrollTop += 100; // this should be smarter.
+                $('#body')[0].scrollTop += 100; // this should be smarter, if scroll position is not at the bottom then it shouldn't automatically scroll.
             }
 
             chat = new Chat();
@@ -47,13 +51,30 @@
                     $('#status').hide();
                     $('#message_list').css('display', 'block');
 
-
-                    chat.live_messages('/live.json');;
+                    //chat.live_messages('/live.json');;
                 });
 
             } else {
                 $('#status').html('Please select a channel.')
             }
+
+
+            $('form').bind('submit', function(e) {
+
+
+
+                chat.post_message(
+                    'post.json',
+                    {message: $('#message').val()},
+                    function() {
+                        console.log('does it come here?')
+
+                        $('#message').val(' ');
+                    }
+                );
+
+                e.preventDefault();
+            });
 
 
         });
@@ -76,7 +97,10 @@
 
 
         <div id="footer">
-            <input type="text" name="message" id="message">
+            <form method="post" action="">
+                <input type="text" name="message" id="message">
+                <input type="submit" value="Send" id="submit">
+            </form>
         </div>
     </div>
 
