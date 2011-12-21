@@ -36,10 +36,10 @@ def register(request):
                 print 'TODO: smn'
                 return json_response({'auth': True})
             else:
-                return json_response({'error': 'Username is already taken.'})    
+                return json_response({'auth': False, 'reason': 'Username is already taken.'})    
             
-        return json_response({'error': 'Username is a required field.'})
-    return json_response({'error': 'Not implemented.'}, status = 501)
+        return json_response({'auth': False, 'reason': 'Username is a required field.'})
+    return json_response({'auth': False, 'reason': 'Not implemented.'}, status = 501)
 
 @pin_required
 def home(request):
