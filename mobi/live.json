@@ -2,11 +2,11 @@
     {
         "author": "John",
         "timestamp": "timestamp in UTC ISO format",
-        "message": "the message posted"
+        "message": "Live MESSAGE # 1"
     },
     {
         "author": "Steve",
         "timestamp": "timestamp in UTC ISO format",
-        "message": "the message posted"
+        "message": "Live MESSAGE # 2"
     }
 ]
