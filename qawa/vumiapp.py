@@ -35,6 +35,7 @@ class QawaApplication(ApplicationWorker):
         except UserStore.RecordNotFound:
             user = user_store.create(msisdn, {
                 'name': name,
+                'msisdn': msisdn,
             })
 
         # Update the group details
@@ -49,14 +50,14 @@ class QawaApplication(ApplicationWorker):
             group = group_store.find(group_name)
             if group.is_member(user):
                 user.leave_group(group_name)
-                return '%s removed from %s' % (user.get('name', msisdn), group_name)
+                return '%s removed from %s' % (
+                            user.get('name') or msisdn, group_name)
             else:
-                return '%s not a member of %s' % (user.get('name', msisdn), group_name)
+                return '%s not a member of %s' % (
+                            user.get('name') or msisdn, group_name)
         except UserStore.RecordNotFound:
-            log.err()
             return 'User %s not found' % (msisdn,)
         except GroupStore.RecordNotFound:
-            log.err()
             return 'Group %s not found' % (group_name,)
 
     def handle_query(self, user_id, name):
