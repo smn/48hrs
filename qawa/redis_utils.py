@@ -32,7 +32,7 @@ class RedisRecord(object):
 
     def save(self):
         self.store.save_dict(self.key, self._data)
-    
+
     def __eq__(self, other):
         return self.key == other.key
 
@@ -55,6 +55,7 @@ class RedisStore(object):
     def __init__(self, redis):
         self.r_server = redis
         exception_class_name = '%sRecordNotFound' % (self.__class__.__name__,)
+        self.index_key = self.generate_key('/index')
         self.__class__.RecordNotFound = type(exception_class_name,
                                             (RecordNotFound,), {})
 
@@ -86,6 +87,7 @@ class RedisStore(object):
         key = self.generate_key(pk)
         record = self.make_record(key, data)
         record.save()
+        self.add_to_set(self.index_key, pk)
         return record
 
     def get_or_make(self, pk):
@@ -103,13 +105,17 @@ class RedisStore(object):
             return record
         raise self.RecordNotFound('Cannot find record with key %s' % (repr(key),))
 
+    def all(self):
+        pks = self.set_members(self.index_key)
+        return [self.find(pk) for pk in pks]
+
 
 class UserStoreRecord(RedisRecord):
     def __init__(self, *args, **kwargs):
         super(UserStoreRecord, self).__init__(*args, **kwargs)
         self.groups_key = '%s:groups' % (self.key,)
         self.group_store = GroupStore(self.store.r_server)
-    
+
     def join_group(self, group_name):
         try:
             group = self.group_store.find(group_name)
@@ -119,17 +125,17 @@ class UserStoreRecord(RedisRecord):
             })
         group.add_member(self)
         self.store.add_to_set(self.groups_key, group_name)
-    
+
     def leave_group(self, group_name):
         group = self.group_store.find(group_name)
         group.remove_member(self)
         self.store.remove_from_set(self.groups_key, group_name)
-        
+
 
 class UserStore(RedisStore):
-    
+
     record_class = UserStoreRecord
-    
+
     def generate_key(self, msisdn):
         return 'user:%s' % (msisdn,)
 
@@ -170,12 +176,4 @@ class GroupStore(RedisStore):
 
     def generate_key(self, *args):
         return ':'.join(['group'] + map(str, args))
-
-    # def find_for_user(self, user_id, group_name):
-    #     key = self.generate_key(group_name, user_id)
-    #     return self.find(key)
-    # 
-    # def create_for_user(self, user_id, group_name):
-    #     key = self.generate_key(group_name, user_id)
-    #     return self.create(key, {'name': group_name})
 
