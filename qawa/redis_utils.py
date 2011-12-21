@@ -1,4 +1,5 @@
 import redis
+from datetime import datetime
 
 class RedisStoreException(Exception): pass
 class RecordNotFound(RedisStoreException): pass
@@ -188,12 +189,21 @@ class MessageStore(RedisStore):
     def generate_key(self, *args):
         return ':'.join(['message'] + map(str, args))
 
-    def add(self, user_id, group_name, message):
-        key = self.generate_key(group_name)
-        self.r_server.lpush(key, message)
+    def add(self, user_id, group_name, message, timestamp=datetime.now()):
+        try:
+            user = userstore.find(user_id)
+            message = json.dumps([{
+                'message': message,
+                'timestamp': timestamp.isoformat(),
+                'author': user.get('name') or user_id,
+            }])
+            key = self.generate_key(group_name)
+            self.r_server.lpush(key, message)
 
-        key = self.generate_key(user_id, group_name)
-        self.r_server.lpush(key, message)
+            key = self.generate_key(user_id, group_name)
+            self.r_server.lpush(key, message)
+        except UserStore.RecordNotFound:
+            pass
 
     def get_messages(self, group_name):
         key = self.generate_key(group_name)
