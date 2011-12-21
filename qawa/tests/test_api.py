@@ -3,12 +3,13 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from vumi.tests.utils import FakeRedis
 from qawa import views
-from qawa.redis_utils import UserStore
+from qawa.redis_utils import UserStore, GroupStore
 
 class ApiTestCase(TestCase):
     def setUp(self):
         fake_redis = FakeRedis()
         views.user_store = UserStore(fake_redis)
+        views.group_store = GroupStore(fake_redis)
         self.client = Client()
 
     def test_authentication(self):
@@ -30,17 +31,8 @@ class ApiTestCase(TestCase):
         resp = self.client.post(reverse('auth'), {'username': '0123456789', 'password': 'test'})
         self.assertContains(resp, 'Cannot authenticate user.')
 
-        resp = self.client.get(reverse('register'))
-        self.assertTrue(resp.status_code, 501)
-
-        resp = self.client.post(reverse('register'), {'username': '0123456789'})
-        self.assertContains(resp, '"auth": true')
-
         usr = views.user_store.register('0123456789','test')
-
-        resp = self.client.post(reverse('register'), {'username': '0123456789'})
-        self.assertContains(resp, 'Username is already taken.')
-
+        
         resp = self.client.post(reverse('auth'), {'username': '0123456789', 'password': 'test'})
         self.assertContains(resp, '"auth": true')
 
@@ -49,3 +41,34 @@ class ApiTestCase(TestCase):
 
         resp = self.client.get(reverse('auth'))
         self.assertContains(resp, '"auth": true')
+
+    def test_register_view(self):
+        resp = self.client.get(reverse('register'))
+        self.assertTrue(resp.status_code, 501)
+
+        resp = self.client.post(reverse('register'), {'username': '0123456789'})
+        self.assertContains(resp, '"auth": true')
+        
+        usr = views.user_store.register('0123456789','test')
+
+        resp = self.client.post(reverse('register'), {'username': '0123456789'})
+        self.assertContains(resp, 'Username is already taken.')
+        
+    def test_groups_view(self):
+        resp = self.client.get(reverse('groups'))
+        self.assertTrue(resp.status_code, 403)
+        
+        usr = views.user_store.register('0123456789','test')
+        
+        resp = self.client.post(reverse('auth'), {'username': '0123456789', 'password': 'test'})
+
+        resp = self.client.get(reverse('groups'))
+        self.assertContains(resp, '[]')
+        
+        usr = views.user_store.register('0123456789','test')
+
+        resp = self.client.post(reverse('groups'), {'name': 'coffee lovers'})
+        self.assertTrue(resp.status_code, 201)
+        
+        resp = self.client.post(reverse('groups'), {'name': 'coffee lovers'})
+        self.assertTrue(resp.status_code, 400)

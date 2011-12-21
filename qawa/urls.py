@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     url(r'^$', 'qawa.views.home', name='home'),
     url(r'^auth.json$', 'qawa.views.auth', name='auth'),
     url(r'^register.json$', 'qawa.views.register', name='register'),
+    url(r'^groups.json$', 'qawa.views.groups', name='groups'),
     # url(r'^qawa/', include('qawa.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
