@@ -217,4 +217,5 @@ class MessageStore(RedisStore):
     def get_live_messages(self, user_id, group_name):
         key = self.generate_key(user_id, group_name)
         data = self.r_server.lpop(key)
-        return json.loads(data)
+        if data:
+            return json.loads(data)
