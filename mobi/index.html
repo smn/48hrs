@@ -21,27 +21,22 @@
                 2. Connect to channel.
             */
 
-            chat = new Chat();
 
             Chat.prototype.draw_messages = function(msgs) {
-
-
                 var l = msgs.length,
                     msgs_html = '';
 
 
                 for (var i = 0; i < l; i++) {
                     var msg = msgs[i];
-
-                     msgs_html += '<li><span>' + msg.author + '</span></li>'
+                     msgs_html += '<li><span>' + msg.author + '</span>' + msg.message + '</li>';
                 }
+                $('#message_list').append(msgs_html)
 
-                $('#message_list').html(msgs_html)
-
-                $('#message_list').css('display', 'block');
-
+                $('#body')[0].scrollTop += 100; // this should be smarter.
             }
 
+            chat = new Chat();
 
 
             var channel = window.location.hash || false;
@@ -50,6 +45,10 @@
 
                 chat.past_messages('/messages.json', function() {
                     $('#status').hide();
+                    $('#message_list').css('display', 'block');
+
+
+                    chat.live_messages('/live.json');;
                 });
 
             } else {
@@ -70,8 +69,6 @@
 
         <div id="body">
             <ul id="message_list">
-                <li>1</li>
-                <li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li><li>1</li>
             </ul>
 
             <div id="status">Loading...</div>

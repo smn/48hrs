@@ -1,0 +1,12 @@
+[
+    {
+        "author": "John",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "Live MESSAGE # 1"
+    },
+    {
+        "author": "Steve",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "Live MESSAGE # 2"
+    }
+]

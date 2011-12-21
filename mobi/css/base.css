@@ -60,6 +60,10 @@ body, input {
 #message_list {
     display:none;
 }
+#message_list span {
+    color:#666;
+    padding-right:10px;
+}
 
 #status {
     text-align:center;
