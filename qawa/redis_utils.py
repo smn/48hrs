@@ -65,6 +65,9 @@ class RedisStore(object):
     def key_exists(self, key):
         return self.r_server.exists(key)
 
+    def exists(self, pk):
+        return self.key_exists(self.generate_key(pk))
+
     def make_record(self, key, data):
         return self.record_class(self, key, **data)
 

@@ -17,6 +17,10 @@ class GroupStoreTestCase(TestCase):
             'name': 'group-name',
         })
 
+    def test_group_creating(self):
+        self.assertTrue(self.group_store.exists('group-name'))
+        self.assertIn(self.group, self.group_store.all())
+
     def test_group_member_adding(self):
         self.group.add_member(self.user)
         self.assertTrue(self.group.is_member(self.user))
