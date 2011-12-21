@@ -54,6 +54,11 @@ def register(request):
         return json_response({'auth': False, 'reason': 'Username is a required field.'})
     return json_response({'auth': False, 'reason': 'Not implemented.'}, status = 501)
 
+def logout(request):
+    request.session[settings.QAWA_SESSION_KEY] = False
+    request.session['qawa_username'] = None
+    return redirect('home')
+
 @login_required
 def home(request):
     return render(request, 'index.html')
