@@ -16,3 +16,11 @@ class RegisterForm(Form):
         help_text = 'Required. Valid phone number in the format: 0821234567 or +27821234567',
         error_message = 'Please enter a valid phone number without spaces. e.g 0821234567 or +27821234567',
         required = True)
+        
+class GroupsForm(Form):
+    name = CharField(required = True)
+            
+class MessagesForm(Form):
+    group = CharField(required = True)
+    message = CharField(required = True)
+    
