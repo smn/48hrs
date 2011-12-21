@@ -35,8 +35,8 @@ body, input {
     bottom:0px;
     top:auto;
 }
-#footer input {
-    width:90%;
+#footer #message {
+
 }
 
 #body {
