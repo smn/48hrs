@@ -1,5 +1,6 @@
 import redis
 from datetime import datetime
+import json
 
 class RedisStoreException(Exception): pass
 class RecordNotFound(RedisStoreException): pass
@@ -207,8 +208,8 @@ class MessageStore(RedisStore):
 
     def get_messages(self, group_name):
         key = self.generate_key(group_name)
-        return self.r_server.lrange(key, 0, 10)
+        return [json.loads(value) for value in self.r_server.lrange(key, 0, 10)]
 
     def get_live_messages(self, user_id, group_name):
         key = self.generate_key(user_id, group_name)
-        return self.r_server.lpop(key)
+        return json.loads(self.r_server.lpop(key))
