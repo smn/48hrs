@@ -192,7 +192,8 @@ class MessageStore(RedisStore):
 
     def add(self, user_id, group_name, message, timestamp=datetime.now()):
         try:
-            user = userstore.find(user_id)
+            user_store = UserStore(self.r_server)
+            user = user_store.find(user_id)
             message = json.dumps([{
                 'message': message,
                 'timestamp': timestamp.isoformat(),
@@ -212,4 +213,5 @@ class MessageStore(RedisStore):
 
     def get_live_messages(self, user_id, group_name):
         key = self.generate_key(user_id, group_name)
-        return json.loads(self.r_server.lpop(key))
+        data = self.r_server.lpop(key)
+        return json.loads(data)
