@@ -159,6 +159,12 @@ class UserStore(RedisStore):
 
     def user_exists(self, username):
         return self.key_exists(self.generate_key(username))
+    
+    def friendly_name(self, username):
+        user = self.get('username')
+        if user and not user.get('name') == 'None':
+            return user.get('name')
+        return username
 
 class GroupStoreRecord(RedisRecord):
 
@@ -196,12 +202,12 @@ class MessageStore(RedisStore):
     def add(self, user_id, group_name, message, timestamp=datetime.now()):
         try:
             user_store = UserStore(self.r_server)
-            user = user_store.find(user_id)
-            message = json.dumps([{
+            user = user_store.friendly_name(user_id)
+            message = json.dumps({
                 'message': message,
                 'timestamp': timestamp.isoformat(),
-                'author': user.get('name') or user_id,
-            }])
+                'author': user,
+            })
             key = self.generate_key(group_name)
             self.r_server.lpush(key, message)
 
@@ -212,10 +218,10 @@ class MessageStore(RedisStore):
 
     def get_messages(self, group_name):
         key = self.generate_key(group_name)
-        return [json.loads(value) for value in self.r_server.lrange(key, 0, 10)]
+        return [json.loads(value) for value in self.r_server.lrange(key, 0, 9)]
 
     def get_live_messages(self, user_id, group_name):
         key = self.generate_key(user_id, group_name)
         data = self.r_server.lpop(key)
         if data:
-            return json.loads(data)
+            return [json.loads(data)]

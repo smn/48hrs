@@ -33,6 +33,9 @@ def auth(request):
         else:
             return json_response({'auth': False, 'reason': get_form_errors_as_string(form)})
     
+    if request.session[settings.QAWA_SESSION_KEY]:
+        return redirect('home')
+    
     form = AuthForm()
     return render(request, 'login.html', {'form': form})
 
@@ -80,25 +83,23 @@ def messages(request):
         if form.is_valid():            
             group = form.cleaned_data['group']
             message = form.cleaned_data['message']
-            if group_store.exists(group):
-                message_store.add(username, group[1:], message)
-                return json_response('Created.', status = 201)
-            else:
-                return json_response('Group not found.', status = 400)
+            message_store.add(username, group[1:], message)
+            return json_response('Created.', status = 201)
         else:
             return json_response(get_form_errors_as_string(form), status = 400)
     
     group = request.GET.get('channel')
     
     if group:
-        return HttpResponse(message_store.get_messages(username, group[:1]))
+        return json_response(message_store.get_messages(group[1:]))
     return json_response('Please select a channel.', status = 400)
 
 @pin_required
 def live(request):
     group = request.GET.get('channel')
     username = request.session['qawa_username']
-    
+
     if group:
-        return HttpResponse(message_store.get_live_message(username, group[:1]))
+        messages = message_store.get_live_messages(username, group[1:])
+        return json_response(messages)
     return json_response('Please select a channel.', status = 400)

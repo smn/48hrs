@@ -37,9 +37,11 @@ var Chat = (function() {
             url: url,
             data: {channel: channel},
             success: function(r) {
-                that.draw_messages(r);
+                if(r) that.draw_messages(r);
+                
                 error_sleep_time = 500;
                 window.setTimeout(function() {that.live_messages(url, channel)}, 1000); // change this to zero when testing live.
+                
             },
 
             error: function(r) {

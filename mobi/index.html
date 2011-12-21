@@ -29,7 +29,7 @@
                 // should trim some of the old messages off.
 
 
-                for (var i = 0; i < l; i++) {
+                for (var i = l - 1; i >= 0; i--) {
                     var msg = msgs[i];
                      msgs_html += '<li><span>' + msg.author + '</span>' + msg.message + '</li>';
                 }
@@ -65,9 +65,14 @@
 
             $('form').bind('submit', function(e) {
                 // submit the form to post a message.
+                var channel = window.location.hash || false;
                 chat.post_message(
-                    'post.json',
-                    {message: $('#message').val()},
+                    'messages.json',
+                    {
+                        group: channel,
+                        message: $('#message').val(),
+                        csrfmiddlewaretoken: '{{csrf_token}}'
+                    },
                     function() {
                         // remove input text.
                         $('#message').val('');
