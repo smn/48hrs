@@ -13,7 +13,9 @@ class GroupStoreTestCase(TestCase):
             'msisdn': self.msisdn,
         })
         self.user.save()
-        self.group, _ = self.group_store.get_or_make('group-name')
+        self.group = self.group_store.create('group-name', {
+            'name': 'group-name',
+        })
 
     def test_group_member_adding(self):
         self.group.add_member(self.user)
@@ -24,6 +26,18 @@ class GroupStoreTestCase(TestCase):
         self.assertTrue(self.group.is_member(self.user))
         self.group.remove_member(self.user)
         self.assertFalse(self.group.is_member(self.user))
+
+    def test_group_listing(self):
+        group1 = self.group_store.create('group1', {
+            'name': 'group1',
+        })
+        group2 = self.group_store.create('group2', {
+            'name': 'group2',
+        })
+        self.assertIn(self.group, self.group_store.all())
+        self.assertIn(group1, self.group_store.all())
+        self.assertIn(group2, self.group_store.all())
+
 
 
 class UserStoreTestCase(TestCase):
