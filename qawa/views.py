@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 from qawa.utils import pin_required, json_response
-from qawa.forms import AuthForm, RegisterForm, GroupsForm
+from qawa.forms import AuthForm, RegisterForm, GroupsForm, MessagesForm
 from qawa.redis_utils import UserStore, GroupStore
 from django.conf import settings
 import redis
@@ -64,3 +64,34 @@ def groups(request):
         else:
             return json_response(get_form_errors_as_string(form), status = 400)
     return json_response(group_store.all())
+
+@pin_required
+def messages(request):
+    if request.method == 'POST':
+        form = MessagesForm(request.POST)
+        if form.is_valid():            
+            group = form.cleaned_data['group']
+            message = form.cleaned_data['message']
+            if group_store.exists(group):
+                #message_store.add(group, message)
+                return json_response('Created.', status = 201)
+            else:
+                return json_response('Group not found.', status = 400)
+        else:
+            return json_response(get_form_errors_as_string(form), status = 400)
+    return json_response([])
+
+@pin_required
+def live(request):
+    messages = [
+    {
+        "author": "John",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "Live MESSAGE # 1"
+    },
+    {
+        "author": "Steve",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "Live MESSAGE # 2"
+    }]
+    return json_response(messages)

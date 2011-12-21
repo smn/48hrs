@@ -64,11 +64,34 @@ class ApiTestCase(TestCase):
 
         resp = self.client.get(reverse('groups'))
         self.assertContains(resp, '[]')
-        
-        usr = views.user_store.register('0123456789','test')
 
         resp = self.client.post(reverse('groups'), {'name': 'coffee lovers'})
         self.assertTrue(resp.status_code, 201)
         
         resp = self.client.post(reverse('groups'), {'name': 'coffee lovers'})
         self.assertTrue(resp.status_code, 400)
+
+    def test_messages_view(self):
+        resp = self.client.get(reverse('messages'))
+        self.assertTrue(resp.status_code, 403)
+        
+        usr = views.user_store.register('0123456789','test')
+        
+        resp = self.client.post(reverse('auth'), {'username': '0123456789', 'password': 'test'})
+
+        resp = self.client.get(reverse('messages'))
+        self.assertContains(resp, '[]')
+
+        resp = self.client.post(reverse('messages'), {'group': 'coffee lovers', 'message': 'hello world!'})
+        self.assertTrue(resp.status_code, 201)
+
+    def test_live_view(self):
+        resp = self.client.get(reverse('live'))
+        self.assertTrue(resp.status_code, 403)
+        
+        usr = views.user_store.register('0123456789','test')
+        
+        resp = self.client.post(reverse('auth'), {'username': '0123456789', 'password': 'test'})
+
+        resp = self.client.get(reverse('live'))
+        self.assertContains(resp, 'Live MESSAGE # 1')

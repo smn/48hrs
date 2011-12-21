@@ -19,3 +19,8 @@ class RegisterForm(Form):
         
 class GroupsForm(Form):
     name = CharField(required = True)
+            
+class MessagesForm(Form):
+    group = CharField(required = True)
+    message = CharField(required = True)
+    
