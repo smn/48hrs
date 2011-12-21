@@ -24,14 +24,14 @@ class ParserTestCase(TestCase):
     def test_add_to_default_group_without_name(self):
         for number in self.number_variations:
             self.assertParsedResponse('+%s' % (number,), ('add', {
-                'group': None,
+                'group_name': '',
                 'msisdn': '+27761234567',
-                'name': None,
+                'name': '',
             }))
 
     def test_add_to_default_group_with_name(self):
         response = ('add', {
-            'group': None,
+            'group_name': '',
             'msisdn': '+27761234567',
             'name': 'simon'
         })
@@ -41,16 +41,16 @@ class ParserTestCase(TestCase):
 
     def test_add_to_default_group_with_name_and_surname(self):
         self.assertParsedResponse('+0761234567 simon de haan', ('add', {
-            'group': None,
+            'group_name': '',
             'msisdn': '+27761234567',
             'name': 'simon de haan'
         }))
 
     def test_add_to_named_group_without_name(self):
         response = ('add', {
-            'group': 'coffeelovers',
+            'group_name': 'coffeelovers',
             'msisdn': '+27761234567',
-            'name': None,
+            'name': '',
         })
         for number in self.number_variations:
             self.assertParsedResponse('#coffeelovers +%s' % (number,),
@@ -58,7 +58,7 @@ class ParserTestCase(TestCase):
 
     def test_add_to_named_group_with_name(self):
         response = ('add', {
-            'group': 'coffeelovers',
+            'group_name': 'coffeelovers',
             'msisdn': '+27761234567',
             'name': 'simon_de_haan',
         })
@@ -68,14 +68,14 @@ class ParserTestCase(TestCase):
 
     def test_add_to_named_group_with_name_and_surname(self):
         self.assertParsedResponse('#coffeelovers +0761234567 simon de haan', ('add', {
-            'group': 'coffeelovers',
+            'group_name': 'coffeelovers',
             'msisdn': '+27761234567',
             'name': 'simon de haan'
         }))
 
     def test_remove_from_group_without_name(self):
         response = ('remove', {
-            'group': None,
+            'group_name': '',
             'msisdn': '+27761234567',
         })
         for number in self.number_variations:
@@ -83,7 +83,7 @@ class ParserTestCase(TestCase):
 
     def test_remove_from_group_with_name(self):
         response = ('remove', {
-            'group': 'coffeelovers',
+            'group_name': 'coffeelovers',
             'msisdn': '+27761234567',
         })
         for number in self.number_variations:
