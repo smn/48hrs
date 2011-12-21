@@ -13,9 +13,6 @@ class ApiTestCase(TestCase):
         self.client = Client()
 
     def test_authentication(self):
-        resp = self.client.get(reverse('home'))
-        self.assertTrue(resp.status_code, 403)
-
         resp = self.client.get(reverse('auth'))
         self.assertTrue(resp.status_code, 403)
 
@@ -86,12 +83,15 @@ class ApiTestCase(TestCase):
         self.assertTrue(resp.status_code, 201)
 
     def test_live_view(self):
-        resp = self.client.get(reverse('live'))
-        self.assertTrue(resp.status_code, 403)
+        resp = self.client.get(reverse('live'), {'channel': 'coffee lovers'})
+        #self.assertTrue(resp.status_code, 403)
         
         usr = views.user_store.register('0123456789','test')
         
         resp = self.client.post(reverse('auth'), {'username': '0123456789', 'password': 'test'})
 
+        resp = self.client.get(reverse('live'), {'channel': 'coffee lovers'})
+        self.assertTrue(resp.status_code, 200)
+        
         resp = self.client.get(reverse('live'))
-        self.assertContains(resp, 'Live MESSAGE # 1')
+        self.assertTrue(resp.status_code, 400)

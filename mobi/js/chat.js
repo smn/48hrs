@@ -11,11 +11,12 @@ var Chat = (function() {
     };
 
     // used only once to fetch messages in the past.
-    Chat.fn.past_messages = function(url, callback) {
+    Chat.fn.past_messages = function(url, channel, callback) {
 
         var that = this;
         $.ajax({
             url: url,
+            data: {channel: channel},
             success: function(r) {
                 that.draw_messages(r);
                 callback();
@@ -30,19 +31,20 @@ var Chat = (function() {
     // once called is always called to fetch live messages.
     // should open a long poll connection, and wait for a response,
     // when repsonse is received a new connection is immediatly opened.
-    Chat.fn.live_messages = function(url) {
+    Chat.fn.live_messages = function(url, channel) {
         var that = this;
         $.ajax({
             url: url,
+            data: {channel: channel},
             success: function(r) {
                 that.draw_messages(r);
                 error_sleep_time = 500;
-                window.setTimeout(function() {that.live_messages(url)}, 1000); // change this to zero when testing live.
+                window.setTimeout(function() {that.live_messages(url, channel)}, 1000); // change this to zero when testing live.
             },
 
             error: function(r) {
                 error_sleep_time *= 2;
-                window.setTimeout(function() { that.live_messages(url) }, error_sleep_time);
+                window.setTimeout(function() { that.live_messages(url, channel) }, error_sleep_time);
                 console.log("Error: Coudln't fetch live messages, sleeping for", error_sleep_time, "ms");
             }
         });

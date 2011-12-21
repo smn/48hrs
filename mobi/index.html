@@ -5,9 +5,9 @@
     <title>Qawa</title>
 
 
-    <link rel="stylesheet" type="text/css" href="css/base.css">
-    <script type="text/javascript" src="js/ender.min.js"></script>
-    <script type="text/javascript" src="js/chat.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}base.css">
+    <script type="text/javascript" src="{{ STATIC_URL }}ender.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}chat.js"></script>
     <script type="text/javascript">
 
 
@@ -45,12 +45,12 @@
             if (channel) {
                 $('#status').html('Connecting to ' + channel + '...');
                 // fetch historical messages
-                chat.past_messages('/messages.json', function() {
+                chat.past_messages('/messages.json', channel, function() {
 
                     // once historical messages are fetched start fetching live messages.
                     $('#status').hide();
                     $('#message_list').css('display', 'block');
-                    chat.live_messages('/live.json');
+                    chat.live_messages('/live.json', channel);
                 });
 
             } else {

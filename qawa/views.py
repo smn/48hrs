@@ -3,7 +3,9 @@ from qawa.utils import pin_required, json_response
 from qawa.forms import AuthForm, RegisterForm, GroupsForm, MessagesForm
 from qawa.redis_utils import UserStore, GroupStore
 from django.conf import settings
+from django.shortcuts import render
 import redis
+import random
 
 redis = redis.Redis()
 user_store = UserStore(redis)
@@ -46,11 +48,10 @@ def register(request):
         return json_response({'auth': False, 'reason': 'Username is a required field.'})
     return json_response({'auth': False, 'reason': 'Not implemented.'}, status = 501)
 
-@pin_required
 def home(request):
-    return json_response({'message': 'Hello world!'})
+    return render(request, 'index.html')
 
-@pin_required
+#@pin_required
 def groups(request):
     if request.method == 'POST':
         form = GroupsForm(request.POST)
@@ -65,7 +66,7 @@ def groups(request):
             return json_response(get_form_errors_as_string(form), status = 400)
     return json_response(group_store.all())
 
-@pin_required
+#@pin_required
 def messages(request):
     if request.method == 'POST':
         form = MessagesForm(request.POST)
@@ -81,17 +82,37 @@ def messages(request):
             return json_response(get_form_errors_as_string(form), status = 400)
     return json_response([])
 
-@pin_required
+#@pin_required
 def live(request):
-    messages = [
+    channel = request.GET.get('channel')
+    messages1 = [
+    {
+        "author": "Susan",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "Did you really name your son Robert'); Drop Table Students;--?"
+    },
     {
         "author": "John",
         "timestamp": "timestamp in UTC ISO format",
-        "message": "Live MESSAGE # 1"
-    },
-    {
-        "author": "Steve",
-        "timestamp": "timestamp in UTC ISO format",
-        "message": "Live MESSAGE # 2"
+        "message": "Oh yes. Little Bobby tables we call him."
     }]
-    return json_response(messages)
+    
+    messages2 = [
+    {
+        "author": "Susan",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "Hi! I'm new here."
+    }]
+    
+    messages3 = [
+    {
+        "author": "Paul",
+        "timestamp": "timestamp in UTC ISO format",
+        "message": "What lovely weather we having today!"
+    }]
+    
+    rand_store = [[], messages1, messages2, messages3]
+    if channel:
+        #get live message for a particular group
+        return json_response(rand_store[random.choice([0,0,0,1,0,2,0,0,3])])
+    return json_response('Please select a channel.', status = 400)
