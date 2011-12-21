@@ -17,16 +17,14 @@
 
         $.domReady(function() {
             /*
-                1. resize body window height to accommodate device window height.
-                2. Connect to channel.
+              Todo.
+                1. resize #body height to accommodate device window height.
             */
 
 
             Chat.prototype.draw_messages = function(msgs) {
                 var l = msgs.length,
                     msgs_html = '';
-
-
 
                 // should trim some of the old messages off.
 
@@ -46,33 +44,32 @@
             var channel = window.location.hash || false;
             if (channel) {
                 $('#status').html('Connecting to ' + channel + '...');
-
+                // fetch historical messages
                 chat.past_messages('/messages.json', function() {
+
+                    // once historical messages are fetched start fetching live messages.
                     $('#status').hide();
                     $('#message_list').css('display', 'block');
-
-                    //chat.live_messages('/live.json');;
+                    chat.live_messages('/live.json');
                 });
 
             } else {
+                // select a channel by appending a hash at the end of the URL.
+                // E.g.: http://localhost#channel_name
                 $('#status').html('Please select a channel.')
             }
 
 
             $('form').bind('submit', function(e) {
-
-
-
+                // submit the form to post a message.
                 chat.post_message(
                     'post.json',
                     {message: $('#message').val()},
                     function() {
-                        console.log('does it come here?')
-
-                        $('#message').val(' ');
+                        // remove input text.
+                        $('#message').val('');
                     }
                 );
-
                 e.preventDefault();
             });
 

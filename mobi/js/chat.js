@@ -5,12 +5,12 @@ var Chat = (function() {
     var Chat = function() {};
     Chat.fn = Chat.prototype;
 
-
+    // generic method, should be overrriden to provide native drawing of messages.
     Chat.fn.draw_messages = function(msgs) {
         console.log(msgs)
     };
 
-
+    // used only once to fetch messages in the past.
     Chat.fn.past_messages = function(url, callback) {
 
         var that = this;
@@ -21,11 +21,15 @@ var Chat = (function() {
                 callback();
             },
             error: function() {
-
+                console.log("Error: Couldn't fetch past messages.")
             }
         })
     };
 
+
+    // once called is always called to fetch live messages.
+    // should open a long poll connection, and wait for a response,
+    // when repsonse is received a new connection is immediatly opened.
     Chat.fn.live_messages = function(url) {
         var that = this;
         $.ajax({
@@ -38,12 +42,13 @@ var Chat = (function() {
 
             error: function(r) {
                 error_sleep_time *= 2;
-                console.log('Poll error, sleeping for', error_sleep_time, 'ms');
                 window.setTimeout(function() { that.live_messages(url) }, error_sleep_time);
+                console.log("Error: Coudln't fetch live messages, sleeping for", error_sleep_time, "ms");
             }
         });
     };
 
+    // a simple xhr post.
     Chat.fn.post_message = function(url, msg, callback) {
 
         $.ajax({
@@ -55,7 +60,7 @@ var Chat = (function() {
                 callback();
             },
             error: function() {
-                console.log('could not post message');
+                console.log("Error: Couldn't post message");
             }
 
         });
