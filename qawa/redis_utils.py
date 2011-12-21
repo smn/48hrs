@@ -93,12 +93,15 @@ class RedisStore(object):
         self.add_to_set(self.index_key, pk)
         return record
 
-    def get_or_make(self, pk):
+    def get_or_create(self, pk, data):
         key = self.generate_key(pk)
         try:
-            return self.find(key), False
+            record = self.find(key)
+            record.update(data)
+            record.save()
+            return record, False
         except self.RecordNotFound:
-            return self.make_record(key, {}), True
+            return self.make_record(key, data), True
 
     def find(self, pk):
         key = self.generate_key(pk)
@@ -188,14 +191,14 @@ class MessageStore(RedisStore):
     def add(self, user_id, group_name, message):
         key = self.generate_key(group_name)
         self.r_server.lpush(key, message)
-        
+
         key = self.generate_key(user_id, group_name)
         self.r_server.lpush(key, message)
 
     def get_messages(self, group_name):
         key = self.generate_key(group_name)
         return self.r_server.lrange(key, 0, 10)
-        
+
     def get_live_messages(self, user_id, group_name):
         key = self.generate_key(user_id, group_name)
         return self.r_server.lpop(key)

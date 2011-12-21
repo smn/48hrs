@@ -2,13 +2,14 @@
 from twisted.python import log
 from vumi.application import ApplicationWorker
 from qawa.parser import QawaParser, QawaSyntaxError
-from qawa.redis_utils import UserStore, GroupStore
+from qawa.redis_utils import UserStore, GroupStore, MessageStore
 from vumi.tests.utils import FakeRedis
 
 parser = QawaParser()
 redis = FakeRedis()
 user_store = UserStore(redis)
 group_store = GroupStore(redis)
+message_store = MessageStore(redis)
 DEFAULT_GROUP_NAME = 'my-group'
 
 class QawaApplication(ApplicationWorker):
@@ -59,6 +60,17 @@ class QawaApplication(ApplicationWorker):
             return 'User %s not found' % (msisdn,)
         except GroupStore.RecordNotFound:
             return 'Group %s not found' % (group_name,)
+
+    def handle_broadcast(self, user_id, groups, message):
+        if not groups:
+            groups = [DEFAULT_GROUP_NAME]
+
+        for group_name in groups:
+            group, _ = group_store.get_or_create(group_name, {
+                'name': group_name,
+            })
+            for user in group.members():
+                message_store.add(user['msisdn'], group_name, message)
 
     def handle_query(self, user_id, name):
         handler = getattr(self, 'handle_query_%s' % (name,), None)

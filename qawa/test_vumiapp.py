@@ -68,3 +68,9 @@ class VumiappTestCase(ApplicationTestCase):
         [response] = yield self.wait_for_dispatched_messages(1)
         self.assertEqual(response['content'],
             'User +%s not found' % (self.msisdn,))
+
+    @inlineCallbacks
+    def test_broadcast_to_default_group(self):
+        yield self.fake_incoming('hello world!')
+        # [response] = yield self.wait_for_dispatched_messages(1)
+        # print response['content']
