@@ -27,19 +27,17 @@ class QawaApplication(ApplicationWorker):
     def handle_add(self, user_id, group_name, msisdn, name):
         # Get and store the user details
         group_name = group_name or DEFAULT_GROUP_NAME
-        user, _ = user_store.get_or_make(msisdn)
-        user['name'] = name
-        user.save()
+        try:
+            user = user_store.find(msisdn)
+            user['name'] = name
+            user.save()
+        except UserStore.RecordNotFound:
+            user = user_store.create(msisdn, {
+                'name': name,
+            })
 
         # Update the group details
-        try:
-            group = group_store.find_for_user(user_id, group_name)
-        except GroupStore.RecordNotFound:
-            group = group_store.create_for_user(user_id, group_name)
-        print group._data
-        group['name'] = group_name
-        group.save()
-        group.add_member(msisdn)
+        user.join_group(group_name)
         return '%s added to %s' % (name or msisdn, group_name)
 
     def handle_remove(self, user_id, group_name, msisdn):
@@ -47,9 +45,9 @@ class QawaApplication(ApplicationWorker):
         group_name = group_name or DEFAULT_GROUP_NAME
         try:
             user = user_store.find(msisdn)
-            group = group_store.find_for_user(user_id, group_name)
-            if group.is_member(msisdn):
-                group.remove_member(msisdn)
+            group = group_store.find(group_name)
+            if group.is_member(user):
+                user.leave_group(group_name)
                 return '%s removed from %s' % (user.get('name', msisdn), group_name)
             else:
                 return '%s not a member of %s' % (user.get('name', msisdn), group_name)

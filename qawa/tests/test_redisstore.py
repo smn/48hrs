@@ -9,42 +9,42 @@ class GroupStoreTestCase(TestCase):
         self.redis = FakeRedis()
         self.user_store = UserStore(self.redis)
         self.group_store = GroupStore(self.redis)
-        self.user, _ = self.user_store.get_or_make(self.msisdn)
+        self.user = self.user_store.create(self.msisdn, {
+            'msisdn': self.msisdn,
+        })
         self.user.save()
         self.group, _ = self.group_store.get_or_make('group-name')
 
     def test_group_member_adding(self):
-        self.group.add_member(self.msisdn)
-        self.assertIn(self.user.key, [user.key for user in
-                                            self.group.members()])
+        self.group.add_member(self.user)
+        self.assertTrue(self.group.is_member(self.user))
 
     def test_group_member_removing(self):
-        self.group.add_member(self.msisdn)
-        self.assertIn(self.user.key, [user.key for user in
-                                            self.group.members()])
-        self.group.remove_member(self.msisdn)
-        self.assertNotIn(self.user.key, [user.key for user in
-                                            self.group.members()])
-
+        self.group.add_member(self.user)
+        self.assertTrue(self.group.is_member(self.user))
+        self.group.remove_member(self.user)
+        self.assertFalse(self.group.is_member(self.user))
 
 
 class UserStoreTestCase(TestCase):
 
     def setUp(self):
         redis = FakeRedis()
-        self.user_store = UserStore(redis)
         self.msisdn = '271234567'
+        self.user_store = UserStore(redis)
+        self.user_record = self.user_store.create(self.msisdn, {
+            'msisdn': self.msisdn,
+            'password': '123',
+        })
 
     def test_user_record_creation(self):
-        user_record = self.user_store.create(self.msisdn, {'password': '123'})
-        self.assertEqual(user_record.key, 'user:%s' % (self.msisdn,))
-        self.assertEqual(user_record['password'], '123')
+        self.assertEqual(self.user_record.key, 'user:%s' % (self.msisdn,))
+        self.assertEqual(self.user_record['password'], '123')
 
     def test_user_record_saving(self):
-        user_record = self.user_store.create(self.msisdn, {'password': '123'})
-        user_record.update({'name': 'simon'})
-        user_record.save()
-        reloaded_record = user_record.reload()
+        self.user_record.update({'name': 'simon'})
+        self.user_record.save()
+        reloaded_record = self.user_record.reload()
         self.assertEqual(reloaded_record['password'], '123')
         self.assertEqual(reloaded_record['name'], 'simon')
         self.assertEqual(reloaded_record.key, 'user:%s' % (self.msisdn,))

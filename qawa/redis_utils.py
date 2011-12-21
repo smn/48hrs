@@ -32,6 +32,9 @@ class RedisRecord(object):
 
     def save(self):
         self.store.save_dict(self.key, self._data)
+    
+    def __eq__(self, other):
+        return self.key == other.key
 
     def reload(self):
         return self.store.make_record(self.key, self.store.read_dict(self.key))
@@ -101,8 +104,32 @@ class RedisStore(object):
         raise self.RecordNotFound('Cannot find record with key %s' % (repr(key),))
 
 
-class UserStore(RedisStore):
+class UserStoreRecord(RedisRecord):
+    def __init__(self, *args, **kwargs):
+        super(UserStoreRecord, self).__init__(*args, **kwargs)
+        self.groups_key = '%s:groups' % (self.key,)
+        self.group_store = GroupStore(self.store.r_server)
+    
+    def join_group(self, group_name):
+        try:
+            group = self.group_store.find(group_name)
+        except GroupStore.RecordNotFound:
+            group = self.group_store.create(group_name, {
+                'name': group_name,
+            })
+        group.add_member(self)
+        self.store.add_to_set(self.groups_key, group_name)
+    
+    def leave_group(self, group_name):
+        group = self.group_store.find(group_name)
+        group.remove_member(self)
+        self.store.remove_from_set(self.groups_key, group_name)
+        
 
+class UserStore(RedisStore):
+    
+    record_class = UserStoreRecord
+    
     def generate_key(self, msisdn):
         return 'user:%s' % (msisdn,)
 
@@ -123,19 +150,18 @@ class GroupStoreRecord(RedisRecord):
         self.members_key = '%s:members' % (self.key,)
         self.user_store = UserStore(self.store.r_server)
 
-    def add_member(self, msisdn):
-        self.store.add_to_set(self.members_key, msisdn)
+    def add_member(self, user_record):
+        self.store.add_to_set(self.members_key, user_record['msisdn'])
 
     def members(self):
         return [self.user_store.find(msisdn)
                     for msisdn in self.store.set_members(self.members_key)]
 
-    def is_member(self, msisdn):
-        member_keys = [user.key for user in self.members()]
-        return self.user_store.generate_key(msisdn) in member_keys
+    def is_member(self, user_record):
+        return user_record in self.members()
 
-    def remove_member(self, msisdn):
-        self.store.remove_from_set(self.members_key, msisdn)
+    def remove_member(self, user_record):
+        self.store.remove_from_set(self.members_key, user_record['msisdn'])
 
 
 class GroupStore(RedisStore):
@@ -145,11 +171,11 @@ class GroupStore(RedisStore):
     def generate_key(self, *args):
         return ':'.join(['group'] + map(str, args))
 
-    def find_for_user(self, user_id, group_name):
-        key = self.generate_key(group_name, user_id)
-        return self.find(key)
-
-    def create_for_user(self, user_id, group_name):
-        key = self.generate_key(group_name, user_id)
-        return self.create(key, {'name': group_name})
+    # def find_for_user(self, user_id, group_name):
+    #     key = self.generate_key(group_name, user_id)
+    #     return self.find(key)
+    # 
+    # def create_for_user(self, user_id, group_name):
+    #     key = self.generate_key(group_name, user_id)
+    #     return self.create(key, {'name': group_name})
 
