@@ -1,9 +1,13 @@
 from twisted.internet.defer import inlineCallbacks, returnValue
 from vumi.application.tests.test_base import ApplicationTestCase
 from vumi.tests.utils import FakeRedis
-from qawa.redis_utils import UserStore, GroupStore
+from vumi.utils import normalize_msisdn
+from qawa.redis_utils import UserStore, GroupStore, MessageStore
 from qawa.vumiapp import QawaApplication, DEFAULT_GROUP_NAME
 from qawa import vumiapp
+
+def normalize(msisdn):
+    return normalize_msisdn(msisdn, country_code='27')
 
 class VumiappTestCase(ApplicationTestCase):
 
@@ -14,8 +18,9 @@ class VumiappTestCase(ApplicationTestCase):
     def setUp(self):
         super(VumiappTestCase, self).setUp()
         fake_redis = FakeRedis()
-        vumiapp.user_store = UserStore(fake_redis)
-        vumiapp.group_store = GroupStore(fake_redis)
+        vumiapp.user_store = self.user_store = UserStore(fake_redis)
+        vumiapp.group_store = self.group_store = GroupStore(fake_redis)
+        vumiapp.message_store = self.message_store = MessageStore(fake_redis)
 
     @inlineCallbacks
     def fake_incoming(self, content):
@@ -71,6 +76,21 @@ class VumiappTestCase(ApplicationTestCase):
 
     @inlineCallbacks
     def test_broadcast_to_default_group(self):
+        yield self.fake_incoming('+%s' % (self.msisdn,))
+        yield self.fake_incoming('+%s' % (self.other_msisdn,))
         yield self.fake_incoming('hello world!')
-        # [response] = yield self.wait_for_dispatched_messages(1)
-        # print response['content']
+        responses = yield self.wait_for_dispatched_messages(2)
+        messages = self.message_store.get_messages(DEFAULT_GROUP_NAME)
+        [message1, message2] = messages
+        self.assertEqual(message1[0]['message'], 'hello world!')
+        self.assertEqual(message1[0]['author'], '+%s' % (self.msisdn,))
+        self.assertEqual(message2[0]['message'], 'hello world!')
+        self.assertEqual(message2[0]['author'], '+%s' % (self.other_msisdn,))
+
+        user_message1 = self.message_store.get_live_messages(
+                            normalize(self.msisdn), DEFAULT_GROUP_NAME)
+        self.assertEqual(user_message1, message1)
+
+        user_message2 = self.message_store.get_live_messages(
+                            normalize(self.other_msisdn), DEFAULT_GROUP_NAME)
+        self.assertEqual(user_message2, message2)
