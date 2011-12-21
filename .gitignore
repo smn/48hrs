@@ -9,3 +9,4 @@
 /qawa/.coverage
 /qawa/coverage.xml
 /qawa/nosetests.xml
+/_trial_temp/
