@@ -1,4 +1,4 @@
-from unittest import TestCase
+from django.test import TestCase
 from qawa.redis_utils import GroupStore, UserStore
 from qawa import redis_utils
 from vumi.tests.utils import FakeRedis
