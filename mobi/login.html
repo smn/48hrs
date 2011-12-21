@@ -1,0 +1,27 @@
+<!doctype HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Qawa</title>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}base.css">
+</head>
+<body>
+
+    <div id="container">
+        <div id="header">
+            Qawa : Enter Cell number
+        </div>
+
+        <div id="footer">
+            <form method="post" action="">
+                <label for="username">Cell number:</label>
+                <input type="text" name="username" id="username">
+                <input type="submit" value="Send" id="submit">
+                 {% csrf_token %}
+            </form>
+        </div>
+    </div>
+
+
+</body>
+</html>

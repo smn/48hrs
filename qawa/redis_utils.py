@@ -145,9 +145,12 @@ class UserStore(RedisStore):
     def authenticate(self, username, password):
         user = self.read_dict(self.generate_key(username))
         return user and user.get('password') == password
+    
+    def get(self, username):
+        return self.read_dict(self.generate_key(username))
 
-    def register(self, username, password):
-        return self.create(username, {'password': password})
+    def register(self, username, name = None):
+        return self.create(username, {'name': name})
 
     def user_exists(self, username):
         return self.key_exists(self.generate_key(username))
