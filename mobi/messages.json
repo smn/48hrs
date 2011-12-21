@@ -1,11 +1,11 @@
 [
     {
-        "author": "1234567890",
+        "author": "John",
         "timestamp": "timestamp in UTC ISO format",
         "message": "the message posted"
     },
     {
-        "author": "1234567890",
+        "author": "Steve",
         "timestamp": "timestamp in UTC ISO format",
         "message": "the message posted"
     }

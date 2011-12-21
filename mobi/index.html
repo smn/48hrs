@@ -7,37 +7,10 @@
 
     <link rel="stylesheet" type="text/css" href="css/base.css">
     <script type="text/javascript" src="js/ender.min.js"></script>
+    <script type="text/javascript" src="js/chat.js"></script>
     <script type="text/javascript">
 
 
-
-
-        var ChatService = (function() {
-
-            var klass = function() {
-
-            };
-            klass.fn = klass.prototype;
-
-
-            klass.fn.get_past = function(opts) {
-                /* ths message will fetch all past messages */
-
-                $.ajax(opts);
-            };
-
-            klass.fn.get_live = function(opts) {
-                /* this method will poll for new messages */
-
-
-                // on success, draw, and recall this method.
-            };
-
-
-
-
-            return klass;
-        })();
 
 
 
@@ -48,25 +21,36 @@
                 2. Connect to channel.
             */
 
+            chat = new Chat();
+
+            Chat.prototype.draw_messages = function(msgs) {
 
 
-            var cs = new ChatService();
+                var l = msgs.length,
+                    msgs_html = '';
+
+
+                for (var i = 0; i < l; i++) {
+                    var msg = msgs[i];
+
+                     msgs_html += '<li><span>' + msg.author + '</span></li>'
+                }
+
+                $('#message_list').html(msgs_html)
+
+                $('#message_list').css('display', 'block');
+
+            }
+
 
 
             var channel = window.location.hash || false;
             if (channel) {
                 $('#status').html('Connecting to ' + channel + '...');
 
-                cs.get_past({
-                    url: '/messages.json',
-                    success: function(r) {
-                        console.log('pew')
-                    },
-                    error: function() {
-                        console.log('error');
-                    },
+                chat.past_messages('/messages.json', function() {
+                    $('#status').hide();
                 });
-
 
             } else {
                 $('#status').html('Please select a channel.')
