@@ -31,10 +31,9 @@ var Chat = (function() {
         $.ajax({
             url: url,
             success: function(r) {
-                that.draw_messages(r)
-
-
-                window.setTimeout(function() {that.live_messages(url)}, 1000);
+                that.draw_messages(r);
+                error_sleep_time = 500;
+                window.setTimeout(function() {that.live_messages(url)}, 1000); // change this to zero when testing live.
             },
 
             error: function(r) {
@@ -43,9 +42,24 @@ var Chat = (function() {
                 window.setTimeout(function() { that.live_messages(url) }, error_sleep_time);
             }
         });
+    };
 
+    Chat.fn.post_message = function(url, msg, callback) {
+
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: msg,
+            success: function() {
+                console.log('message was posted...');
+                callback();
+            },
+            error: function() {
+                console.log('could not post message');
+            }
+
+        });
     }
-
 
 
     return Chat;
