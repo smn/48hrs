@@ -46,11 +46,13 @@ POST /auth.json with `username` and `password`
 POST /register.json with `username`
 
 ::
+
     {
         auth: true
     }
     
 ::
+
     {
         auth: false
         reason: 'human friendly reason'
