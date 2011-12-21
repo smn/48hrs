@@ -51,4 +51,20 @@ class VumiappTestCase(ApplicationTestCase):
         yield self.fake_incoming('#coffeelovers +%s' % (self.other_msisdn,))
         yield self.fake_incoming('#coffeelovers -%s' % (self.msisdn,))
         [_, _, response] = yield self.wait_for_dispatched_messages(1)
-        self.assertEqual(response['content'], '+%s not a member of coffeelovers' % (self.msisdn, ))
+        self.assertEqual(response['content'],
+            '+%s not a member of coffeelovers' % (self.msisdn, ))
+
+    @inlineCallbacks
+    def test_remove_from_unknown_group(self):
+        yield self.fake_incoming('+%s' % (self.msisdn,))
+        yield self.fake_incoming('#unknown-group -%s' % (self.msisdn,))
+        [_, response] = yield self.wait_for_dispatched_messages(2)
+        self.assertEqual(response['content'],
+            'Group unknown-group not found')
+
+    @inlineCallbacks
+    def test_remove_unknown_user(self):
+        yield self.fake_incoming('-%s' % (self.msisdn,))
+        [response] = yield self.wait_for_dispatched_messages(1)
+        self.assertEqual(response['content'],
+            'User +%s not found' % (self.msisdn,))

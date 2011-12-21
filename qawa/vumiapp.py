@@ -56,10 +56,8 @@ class QawaApplication(ApplicationWorker):
                 return '%s not a member of %s' % (
                             user.get('name') or msisdn, group_name)
         except UserStore.RecordNotFound:
-            log.err()
             return 'User %s not found' % (msisdn,)
         except GroupStore.RecordNotFound:
-            log.err()
             return 'Group %s not found' % (group_name,)
 
     def handle_query(self, user_id, name):
